@@ -1,36 +1,52 @@
-import express from 'express'
-import path from 'path'
-import http from 'http'
-import { Server } from 'socket.io'
+import { app, BrowserWindow, type App } from 'electron'
 import { Gpio } from 'onoff'
-const app = express()
-const server = http.createServer(app)
-const port = 3000
-const io = new Server(server)
-const button = new Gpio(4, 'in', 'both')
+import Recorder from './utils/recorder'
+const buzzer = new Gpio(16, 'in', 'both')
+const cancel = new Gpio(26, 'in', 'both')
+const recorder = new Recorder()
 
-app.use(express.static(path.resolve(__dirname, './client')))
+let mainWindow: BrowserWindow | null
+let application: App
 
-io.on('connection', (socket) => {
-  console.log('a user connected')
-})
+function onWindowAllClosed (): void {
+  if (process.platform !== 'darwin') {
+    application.quit()
+  }
+}
 
-button.watch((err, value) => {
+function onClose (): void {
+  mainWindow = null
+}
+
+function onReady (): void {
+  mainWindow = new BrowserWindow({ width: 800, height: 600, kiosk: true })
+  void mainWindow.loadURL('file://' + __dirname + '/client/index.html')
+  mainWindow.on('closed', onClose)
+}
+function main(appInstance: App): void {
+  application = appInstance
+  application.on('window-all-closed', onWindowAllClosed)
+  application.on('ready', onReady)
+}
+
+main(app)
+
+buzzer.watch((err, value) => {
   if (err != null) {
     throw err
   }
-
-  io.emit('chat message', 'test')
+  recorder.startRecording()
+  if (mainWindow != null) mainWindow.webContents.send('gpio', 'Hello from Main Process')
 })
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './client', 'index.html'))
-})
-
-app.listen(port, () => {
-  console.log(`Express is listening at http://localhost:${port}`)
+cancel.watch((err, value) => {
+  if (err != null) {
+    throw err
+  }
+  if (mainWindow != null) mainWindow.webContents.send('gpio', 'Hello from Main Process')
 })
 
 process.on('SIGINT', _ => {
-  button.unexport()
+  buzzer.unexport()
+  cancel.unexport()
 })

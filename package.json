@@ -4,9 +4,9 @@
   "description": "La Boite À Question de la Fédération des Maisons de Jeunes",
   "main": "dist/server.js",
   "scripts": {
-    "start": "npm run build && tsc && node dist/server.js",
+    "start": "electron dist/server.js",
+    "build": "npm run lint && webpack --mode production && tsc",
     "dev": "webpack-dev-server --mode development --open --hot",
-    "build": "webpack --mode production",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,11 +26,10 @@
     "express": "^4.17.1",
     "onoff": "^6.0.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "socket.io": "^4.6.2",
-    "socket.io-client": "^4.6.2"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "@types/express": "^4.17.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "css-loader": "^6.8.1",
