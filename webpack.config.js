@@ -3,6 +3,7 @@ const path = require('path')
 
 module.exports = {
   entry: './src/client/App.tsx',
+  target: 'electron-renderer',
   output: {
     path: path.resolve(__dirname, 'dist', 'client'),
     filename: 'bundle.js'
