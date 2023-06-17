@@ -1,27 +1,41 @@
 import { type FC, useState, useEffect } from 'react'
 import { render } from 'react-dom'
+import { ipcRenderer } from 'electron';
 import './App.scss'
 
 const App: FC = () => {
-  const [data, setData] = useState<string | null>(null)
-
-  const fetchData = (): void => {
-    fetch('/api')
-      .then(async (response) => await response.json())
-      .then((data) => { setData(data.message) })
-      .catch((error) => { console.error(error) })
-  }
+  const [slides, setSlides] = useState([])
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [playing, setPlaying] = useState('ready');
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    const next = () => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+    }
+    ipcRenderer.send('get-images');
+    ipcRenderer.on('images', (event, images) => {
+      setSlides(images)
+    })
+    ipcRenderer.on('gpio', (event, type) => {
+      if (type == 'buzzer_ready') setCurrentSlide(0)
+      if (type == 'buzzer_on_play') next()
+      if (type == 'buzzer_finished') setPlaying('ready')
+      if (type == 'cancel') setPlaying('ready')
+    })
+
+    const handleKeyDown = (e) => {
+      e = e || window.event;
+      if (e.keyCode === 39) {
+        next()
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [slides, playing])
 
   return (
     <div className="App">
-      <header className="App-header">
-        Test
-        <p>{data === null || data === '' ? 'Loading...' : data}</p>
-      </header>
+      <img src={slides[currentSlide]} className="flex-item" />
     </div>
   )
 }
