@@ -2,9 +2,9 @@
   "name": "baq-fmj",
   "version": "1.0.0",
   "description": "La Boite À Question de la Fédération des Maisons de Jeunes",
-  "main": "dist/app.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "npm run build && tsc && node dist/app.js",
+    "start": "npm run build && tsc && node dist/server.js",
     "dev": "webpack-dev-server --mode development --open --hot",
     "build": "webpack --mode production",
     "lint": "eslint . --ext .ts",
