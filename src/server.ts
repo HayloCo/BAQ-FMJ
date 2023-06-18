@@ -50,13 +50,13 @@ function main (appInstance: App): void {
 }
 
 ipcMain.on('get-images', (event) => {
-  fs.readdir('/Volumes/Projets/BAQ-FMJ/slides', (err, files): void => {
+  fs.readdir(path.resolve(__dirname, 'slides'), (err, files): void => {
     if (err != null) {
       console.error('Could not read directory:', err)
       return
     }
 
-    const images = files.map(file => path.join('/Volumes/Projets/BAQ-FMJ/slides', file))
+    const images = files.map(file => path.join(path.resolve(__dirname, 'slides'), file))
     event.reply('images', images)
   })
 })
