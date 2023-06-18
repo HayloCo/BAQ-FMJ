@@ -66,14 +66,14 @@ buzzer.watch((err, value) => {
     throw err
   }
   recorder.startRecording()
-  if (mainWindow != null) mainWindow.webContents.send('gpio', 'Hello from Main Process')
+  if (mainWindow != null) mainWindow.webContents.send('gpio', 'buzzer_on_play')
 })
 
 cancel.watch((err, value) => {
   if (err != null) {
     throw err
   }
-  if (mainWindow != null) mainWindow.webContents.send('gpio', 'Hello from Main Process')
+  if (mainWindow != null) mainWindow.webContents.send('gpio', 'cancel')
 })
 
 process.on('SIGINT', _ => {
