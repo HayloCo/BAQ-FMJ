@@ -4,10 +4,12 @@ import { Gpio } from 'onoff'
 import Recorder from './utils/recorder'
 import * as fs from 'fs'
 import * as path from 'path'
-const buzzer = new Gpio(16, 'in', 'both')
-const cancel = new Gpio(26, 'in', 'both')
+const DEBOUNCE_TIMEOUT = 10000 // 10 secondes en millisecondes
+const buzzer = new Gpio(16, 'in', 'rising', { debounceTimeout: DEBOUNCE_TIMEOUT })
+const cancel = new Gpio(26, 'in', 'rising', { debounceTimeout: DEBOUNCE_TIMEOUT })
 const recorder = new Recorder()
 
+let lastPressTime = 0
 let mainWindow: BrowserWindow | null
 let application: App
 const reactDevToolsPath = path.join(
@@ -65,15 +67,26 @@ buzzer.watch((err, value) => {
   if (err != null) {
     throw err
   }
-  recorder.startRecording()
-  if (mainWindow != null) mainWindow.webContents.send('gpio', 'buzzer_on_play')
+  const currentTime = Date.now()
+
+  if (currentTime - lastPressTime > DEBOUNCE_TIMEOUT) {
+    recorder.startRecording()
+    if (mainWindow != null) mainWindow.webContents.send('gpio', 'buzzer_on_play')
+    lastPressTime = currentTime
+  }
 })
 
 cancel.watch((err, value) => {
   if (err != null) {
     throw err
   }
-  if (mainWindow != null) mainWindow.webContents.send('gpio', 'cancel')
+  const currentTime = Date.now()
+
+  if (currentTime - lastPressTime > DEBOUNCE_TIMEOUT) {
+    recorder.stopRecording()
+    if (mainWindow != null) mainWindow.webContents.send('gpio', 'cancel')
+    lastPressTime = currentTime
+  }
 })
 
 process.on('SIGINT', _ => {
