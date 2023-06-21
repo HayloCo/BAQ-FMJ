@@ -25,6 +25,7 @@ const App: FC = () => {
 
     const handleKeyDown = (e) => {
       e = e || window.event;
+      console.log(e.keyCode)
       if (e.keyCode === 67) {
         next()
       }
