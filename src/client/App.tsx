@@ -28,6 +28,9 @@ const App: FC = () => {
       if (e.keyCode === 39) {
         next()
       }
+      if (e.keyCode === 40) {
+        next()
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
