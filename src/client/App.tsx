@@ -12,8 +12,8 @@ const App: FC = () => {
   const [randomNumbers, setRandomNumbers] = useState<number[]>([]);
   const [index, setIndex] = useState(0);
 
-  const slideSize = 0;
-  const random = false;
+  const slideSize = 5;
+  const random = true;
 
   function generateRandomNumbers() {
     const numbers: Set<number> = new Set();
