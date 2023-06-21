@@ -7,29 +7,57 @@ const App: FC = () => {
   const [slides, setSlides] = useState([])
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playing, setPlaying] = useState('ready');
+  const [randomNumbers, setRandomNumbers] = useState<number[]>([]);
+
+  const slideSize = 5;
+  const random = true;
+
+  let index = 0;
+
+  function generateRandomNumbers() {
+    const numbers: Set<number> = new Set();
+
+    while (numbers.size < slideSize) {
+        const randomNumber = Math.floor(Math.random() * slides.length);
+        numbers.add(randomNumber);
+    }
+
+    setRandomNumbers(Array.from(numbers));
+    index = 0; // Réinitialiser l'index
+  }
+
+  function getNextRandomNumber() {
+      if (randomNumbers.length === 0) {
+          // Si la liste n'a pas encore été générée, la générer
+          generateRandomNumbers();
+      }
+
+      const nextNumber = randomNumbers[index];
+      index = (index + 1) % randomNumbers.length;
+      return nextNumber;
+  }
 
   useEffect(() => {
     const next = () => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+      if(random) setCurrentSlide(getNextRandomNumber());
+    }
+    const cancel = () => {
+      setPlaying('ready');
+      generateRandomNumbers();
     }
     ipcRenderer.send('get-images');
     ipcRenderer.on('images', (event, images) => {
       setSlides(images)
     })
-    ipcRenderer.on('gpio', (event, type) => {
-      if (type == 'buzzer_ready') setCurrentSlide(0)
-      if (type == 'buzzer_on_play') next()
-      if (type == 'buzzer_finished') setPlaying('ready')
-      if (type == 'cancel') setPlaying('ready')
-    })
 
     const handleKeyDown = (e) => {
       e = e || window.event;
-      console.log(e.keyCode)
       if (e.keyCode === 67) {
-        next()
+        ipcRenderer.send('cancel');
+        cancel()
       }
-      if (e.keyCode === 40) {
+      if (e.keyCode === 83) {
+        ipcRenderer.send('next');
         next()
       }
     };
