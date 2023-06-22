@@ -80,10 +80,10 @@ ipcMain.on('get-drive', (event) => {
     drives.forEach((drive) => {
       if (drive.isUSB ?? false) {
         drive.mountpoints.forEach((mountpoint) => {
-          if (mountpoint.label === 'FMJEXT') {
+          if (mountpoint.label === 'FMJLOCAL') {
             pathVideos = mountpoint.path
           }
-          if (mountpoint.label === 'FMJLOCAL') {
+          if (mountpoint.label === 'FMJEXTERN') {
             pathUSB = mountpoint.path
           }
         })
