@@ -7,18 +7,19 @@ import start from './slides/start.png';
 
 const App: FC = () => {
   const [slides, setSlides] = useState([])
+  const [config, setConfig] = useState({
+    slideSize: 5,
+    random: true
+  })
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playing, setPlaying] = useState('ready');
   const [randomNumbers, setRandomNumbers] = useState<number[]>([]);
   const [index, setIndex] = useState(0);
 
-  const slideSize = 5;
-  const random = true;
-
   function generateRandomNumbers() {
     const numbers: Set<number> = new Set();
 
-    while (numbers.size < slideSize ?? slides.length ) {
+    while (numbers.size < config.slideSize ?? slides.length ) {
         const randomNumber = Math.floor(Math.random() * slides.length);
         numbers.add(randomNumber);
     }
@@ -30,16 +31,19 @@ const App: FC = () => {
   }
 
   useEffect(() => {
-    ipcRenderer.send('get-images');
+    ipcRenderer.send('get-drive');
     ipcRenderer.on('images', (event, images) => {
       setSlides(images)
+    })
+    ipcRenderer.on('config', (event, config) => {
+      setConfig(config)
     })
   }, [])
   useEffect(() => {
     const next = () => {
       if (playing === 'ready') {
         let newRandomNumbers = generateRandomNumbers();
-        if(random) {
+        if(config.random) {
           setCurrentSlide(newRandomNumbers[0]);
         } else {
           setCurrentSlide(0);
@@ -47,13 +51,13 @@ const App: FC = () => {
         }
         setPlaying('on_play');
         ipcRenderer.send('record');
-      } else if (playing === 'on_play' && index + 1 === (slideSize ? slideSize : slides.length)) {
+      } else if (playing === 'on_play' && index + 1 === (config.slideSize ? config.slideSize : slides.length)) {
           setPlaying('finished');
           ipcRenderer.send('stopRecord');
-      } else if (playing === 'on_play' && index + 1 < (slideSize ? slideSize : slides.length)) {
+      } else if (playing === 'on_play' && index + 1 < (config.slideSize ? config.slideSize : slides.length)) {
         setIndex((prevIndex) => {
-          const newIndex = (prevIndex + 1) % (random ? randomNumbers.length : slides.length);
-          if(random) {
+          const newIndex = (prevIndex + 1) % (config.random ? randomNumbers.length : slides.length);
+          if(config.random) {
             setCurrentSlide(randomNumbers[newIndex]);
           } else {
             setCurrentSlide(newIndex);
@@ -78,7 +82,7 @@ const App: FC = () => {
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [slides, playing, randomNumbers, index, currentSlide])
+  }, [slides, playing, randomNumbers, index, currentSlide, config])
 
   return (
     <div className="App">

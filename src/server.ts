@@ -35,7 +35,7 @@ function onReady (): void {
   })
   void mainWindow.loadURL('file://' + __dirname + '/client/index.html')
   // eslint-disable-next-line no-constant-condition
-  if (true) void session.defaultSession.loadExtension(reactDevToolsPath)
+  if (false) void session.defaultSession.loadExtension(reactDevToolsPath)
   mainWindow.on('closed', onClose)
 }
 
@@ -45,7 +45,7 @@ function main (appInstance: App): void {
   application.on('ready', onReady)
 }
 
-ipcMain.on('get-images', (event) => {
+ipcMain.on('get-drive', (event) => {
   void getDrives().then((drives) => {
     let pathUSB = ''
     drives.forEach((drive) => {
@@ -60,6 +60,11 @@ ipcMain.on('get-images', (event) => {
     const files = fs.readdirSync(path.resolve(pathUSB, 'slides'))
     const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
     event.reply('images', images)
+
+    if (fs.existsSync(path.join(pathUSB, 'config.json'))) {
+      const config = fs.readFileSync(path.join(pathUSB, 'config.json'))
+      event.reply('config', config)
+    }
   })
 })
 
