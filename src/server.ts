@@ -2,7 +2,7 @@ import { app, BrowserWindow, session, ipcMain, type App } from 'electron'
 import { list as getDrives } from 'drivelist'
 import * as os from 'os'
 // import Recorder from './utils/recorder'
-// import * as fs from 'fs'
+import * as fs from 'fs'
 import * as path from 'path'
 // const recorder = new Recorder()
 
@@ -47,19 +47,24 @@ function main (appInstance: App): void {
 
 ipcMain.on('get-images', (event) => {
   void getDrives().then((drives) => {
-    // let path = ''
+    let pathUSB = ''
     drives.forEach((drive) => {
-      if (drive.isUSB ?? false) console.log(drive)
+      if (drive.isUSB ?? false) {
+        drive.mountpoints.forEach((mountpoint) => {
+          if (mountpoint.label === 'UNTITLED') {
+            pathUSB = mountpoint.path
+          }
+        })
+      }
     })
-    /*
-    fs.readdir(path.resolve(__dirname, '..', 'slides'), (err, files): void => {
+    fs.readdir(path.resolve(pathUSB, 'slides'), (err, files): void => {
       if (err != null) {
         console.error('Could not read directory:', err)
         return
       }
-      const images = files.map(file => path.join(path.resolve(__dirname, '..', 'slides'), file))
+      const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
       event.reply('images', images)
-    }) */
+    })
   })
 })
 
