@@ -8,10 +8,6 @@ import * as path from 'path'
 
 let mainWindow: BrowserWindow | null
 let application: App
-const reactDevToolsPath = path.join(
-  os.homedir(),
-  '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.9.0_0'
-)
 
 function onWindowAllClosed (): void {
   if (process.platform !== 'darwin') {
@@ -34,8 +30,6 @@ function onReady (): void {
     }
   })
   void mainWindow.loadURL('file://' + __dirname + '/client/index.html')
-  // eslint-disable-next-line no-constant-condition
-  if (true) void session.defaultSession.loadExtension(reactDevToolsPath)
   mainWindow.on('closed', onClose)
 }
 
