@@ -12,7 +12,10 @@ let pathUSB: string
 
 const ffmpegInstance: FFmpeg = new FFmpeg(
   {
-    inputs: { url: '/dev/video0', options: { f: 'video4linux2', s: '1920x1080', pix_fmt: 'mjpeg', r: '30' } }
+    inputs: [
+      { url: '/dev/video0', options: { vaapi_device: '/dev/dri/renderD128', f: 'v4l2', video_size: '1920x1080', pix_fmt: 'nv12', framerate: '30' } },
+      { url: 'hw:1,0', options: { f: 'alsa' } }
+    ]
   }
 )
 
@@ -50,7 +53,10 @@ ipcMain.on('start-record', (event) => {
   ffmpegInstance.outputs = {
     url: path.join(pathUSB, 'videos', `${Date.now()}.mp4`),
     options: {
-      'c:v': 'libx264',
+      vf: 'format=nv12,hwupload',
+      'c:v': 'h264_vaapi',
+      'b:v': '5M',
+      'profile:v': 578,
       'c:a': 'aac'
     }
   }
