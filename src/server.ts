@@ -1,6 +1,5 @@
-import { app, BrowserWindow, session, ipcMain, type App } from 'electron'
+import { app, BrowserWindow, ipcMain, type App } from 'electron'
 import { list as getDrives } from 'drivelist'
-import * as os from 'os'
 // import Recorder from './utils/recorder'
 import * as fs from 'fs'
 import * as path from 'path'
