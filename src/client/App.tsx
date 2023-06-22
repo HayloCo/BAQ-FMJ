@@ -34,7 +34,8 @@ const App: FC = () => {
     ipcRenderer.on('images', (event, images) => {
       setSlides(images)
     })
-
+  }, [])
+  useEffect(() => {
     const next = () => {
       if (playing === 'ready') {
         let newRandomNumbers = generateRandomNumbers();
