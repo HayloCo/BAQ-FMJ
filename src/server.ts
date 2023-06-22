@@ -1,7 +1,8 @@
 import { app, BrowserWindow, session, ipcMain, type App } from 'electron'
+import { list as getDrives } from 'drivelist'
 import * as os from 'os'
 // import Recorder from './utils/recorder'
-import * as fs from 'fs'
+// import * as fs from 'fs'
 import * as path from 'path'
 // const recorder = new Recorder()
 
@@ -45,14 +46,20 @@ function main (appInstance: App): void {
 }
 
 ipcMain.on('get-images', (event) => {
-  fs.readdir(path.resolve(__dirname, '..', 'slides'), (err, files): void => {
-    if (err != null) {
-      console.error('Could not read directory:', err)
-      return
-    }
-
-    const images = files.map(file => path.join(path.resolve(__dirname, '..', 'slides'), file))
-    event.reply('images', images)
+  void getDrives().then((drives) => {
+    // let path = ''
+    drives.forEach((drive) => {
+      if (drive.isUSB ?? false) console.log(drive)
+    })
+    /*
+    fs.readdir(path.resolve(__dirname, '..', 'slides'), (err, files): void => {
+      if (err != null) {
+        console.error('Could not read directory:', err)
+        return
+      }
+      const images = files.map(file => path.join(path.resolve(__dirname, '..', 'slides'), file))
+      event.reply('images', images)
+    }) */
   })
 })
 
