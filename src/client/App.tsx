@@ -9,7 +9,8 @@ const App: FC = () => {
   const [slides, setSlides] = useState([])
   const [config, setConfig] = useState({
     slideSize: 5,
-    random: true
+    random: true,
+    usbCopy: false
   })
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playing, setPlaying] = useState('ready');

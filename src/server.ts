@@ -11,6 +11,12 @@ let mainWindow: BrowserWindow | null
 let application: App
 let pathUSB: string
 let pathVideos: string
+let config: object = {
+  slideSize: 5,
+  random: true,
+  usbCopy: false
+}
+let fileName: string
 let childProcess: ChildProcess | null
 
 const ffmpegInstance: FFmpeg = new FFmpeg(
@@ -54,8 +60,9 @@ function main (appInstance: App): void {
 
 ipcMain.on('start-record', (event) => {
   if (childProcess == null) {
+    fileName = `${Date.now()}.mp4`
     ffmpegInstance.outputs = {
-      url: path.join(pathVideos, `${Date.now()}.mp4`),
+      url: path.join(pathVideos, fileName),
       options: {
         vf: 'format=nv12,hwupload',
         'c:v': 'h264_vaapi',
@@ -72,6 +79,7 @@ ipcMain.on('stop-record', (event) => {
   if (childProcess != null) {
     childProcess.kill('SIGINT')
     childProcess = null
+    fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos')))
   }
 })
 
@@ -94,8 +102,9 @@ ipcMain.on('get-drive', (event) => {
     event.reply('images', images)
 
     if (fs.existsSync(path.join(pathUSB, 'config.json'))) {
-      const config = fs.readFileSync(path.join(pathUSB, 'config.json'))
+      config = fs.readFileSync(path.join(pathUSB, 'config.json'))
       event.reply('config', config)
+      console.log(config)
     }
   })
 })
