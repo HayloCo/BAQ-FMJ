@@ -11,7 +11,7 @@ let mainWindow: BrowserWindow | null
 let application: App
 let pathUSB: string
 let pathVideos: string
-let config: object = {
+let config = {
   slideSize: 5,
   random: true,
   usbCopy: false
@@ -79,7 +79,7 @@ ipcMain.on('stop-record', (event) => {
   if (childProcess != null) {
     childProcess.kill('SIGINT')
     childProcess = null
-    fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos'), fileName))
+    if (config.usbCopy) fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos'), fileName))
   }
 })
 
