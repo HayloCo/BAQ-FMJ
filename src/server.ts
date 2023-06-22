@@ -103,7 +103,9 @@ ipcMain.on('get-drive', (event) => {
 
     if (fs.existsSync(path.join(pathUSB, 'config.json'))) {
       fs.readFile(path.join(pathUSB, 'config.json'), 'utf8', (_err, c) => {
+        console.log(c)
         config = JSON.parse(c)
+        console.log(config)
         event.reply('config', config)
       })
     }
