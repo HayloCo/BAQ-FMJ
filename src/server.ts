@@ -10,6 +10,7 @@ import { type ChildProcess } from 'child_process'
 let mainWindow: BrowserWindow | null
 let application: App
 let pathUSB: string
+let pathVideos: string
 let childProcess: ChildProcess | null
 
 const ffmpegInstance: FFmpeg = new FFmpeg(
@@ -54,7 +55,7 @@ function main (appInstance: App): void {
 ipcMain.on('start-record', (event) => {
   if (childProcess == null) {
     ffmpegInstance.outputs = {
-      url: path.join(pathUSB, 'videos', `${Date.now()}.mp4`),
+      url: path.join(pathVideos, `${Date.now()}.mp4`),
       options: {
         vf: 'format=nv12,hwupload',
         'c:v': 'h264_vaapi',
@@ -79,7 +80,10 @@ ipcMain.on('get-drive', (event) => {
     drives.forEach((drive) => {
       if (drive.isUSB ?? false) {
         drive.mountpoints.forEach((mountpoint) => {
-          if (mountpoint.label === 'UNTITLED') {
+          if (mountpoint.label === 'FMJEXT') {
+            pathVideos = mountpoint.path
+          }
+          if (mountpoint.label === 'FMJLOCAL') {
             pathUSB = mountpoint.path
           }
         })
