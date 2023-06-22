@@ -57,15 +57,10 @@ ipcMain.on('get-images', (event) => {
         })
       }
     })
-    fs.readdir(path.resolve(pathUSB, 'slides'), (err, files): void => {
-      if (err != null) {
-        console.error('Could not read directory:', err)
-        return
-      }
-      const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
-      console.log('test')
-      event.reply('images', images)
-    })
+    const files = fs.readdirSync(path.resolve(pathUSB, 'slides'));
+    const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
+    console.log('test')
+    event.reply('images', images)
   })
 })
 
