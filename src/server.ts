@@ -63,6 +63,7 @@ ipcMain.on('get-images', (event) => {
         return
       }
       const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
+      console.log('test')
       event.reply('images', images)
     })
   })
