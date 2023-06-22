@@ -102,9 +102,9 @@ ipcMain.on('get-drive', (event) => {
     event.reply('images', images)
 
     if (fs.existsSync(path.join(pathUSB, 'config.json'))) {
-      fs.readFile(path.join(pathUSB, 'config.json'), (_err, c) => {
-        event.reply('config', c)
-        config = c
+      fs.readFile(path.join(pathUSB, 'config.json'), 'utf8', (_err, c) => {
+        config = JSON.parse(c)
+        event.reply('config', config)
       })
     }
   })
