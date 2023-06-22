@@ -4,11 +4,13 @@ import { FFmpeg } from 'kiss-ffmpeg'
 // import Recorder from './utils/recorder'
 import * as fs from 'fs'
 import * as path from 'path'
+import { type ChildProcess } from 'child_process'
 // const recorder = new Recorder()
 
 let mainWindow: BrowserWindow | null
 let application: App
 let pathUSB: string
+let childProcess: ChildProcess | null
 
 const ffmpegInstance: FFmpeg = new FFmpeg(
   {
@@ -50,21 +52,26 @@ function main (appInstance: App): void {
 }
 
 ipcMain.on('start-record', (event) => {
-  ffmpegInstance.outputs = {
-    url: path.join(pathUSB, 'videos', `${Date.now()}.mp4`),
-    options: {
-      vf: 'format=nv12,hwupload',
-      'c:v': 'h264_vaapi',
-      'b:v': '5M',
-      'profile:v': 578,
-      'c:a': 'aac'
+  if (childProcess == null) {
+    ffmpegInstance.outputs = {
+      url: path.join(pathUSB, 'videos', `${Date.now()}.mp4`),
+      options: {
+        vf: 'format=nv12,hwupload',
+        'c:v': 'h264_vaapi',
+        'b:v': '5M',
+        'profile:v': 578,
+        'c:a': 'aac'
+      }
     }
+    childProcess = ffmpegInstance.run()
   }
-  ffmpegInstance.run()
 })
 
 ipcMain.on('stop-record', (event) => {
-  ffmpegInstance.kill()
+  if (childProcess != null) {
+    childProcess.kill('SIGINT')
+    childProcess = null
+  }
 })
 
 ipcMain.on('get-drive', (event) => {
