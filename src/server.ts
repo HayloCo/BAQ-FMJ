@@ -79,7 +79,7 @@ ipcMain.on('stop-record', (event) => {
   if (childProcess != null) {
     childProcess.kill('SIGINT')
     childProcess = null
-    fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos')))
+    fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos'), fileName))
   }
 })
 
