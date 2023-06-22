@@ -35,7 +35,7 @@ function onReady (): void {
   })
   void mainWindow.loadURL('file://' + __dirname + '/client/index.html')
   // eslint-disable-next-line no-constant-condition
-  if (false) void session.defaultSession.loadExtension(reactDevToolsPath)
+  if (true) void session.defaultSession.loadExtension(reactDevToolsPath)
   mainWindow.on('closed', onClose)
 }
 
@@ -59,7 +59,6 @@ ipcMain.on('get-images', (event) => {
     })
     const files = fs.readdirSync(path.resolve(pathUSB, 'slides'))
     const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
-    console.log('test')
     event.reply('images', images)
   })
 })
