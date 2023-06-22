@@ -35,7 +35,7 @@ function onReady (): void {
   })
   void mainWindow.loadURL('file://' + __dirname + '/client/index.html')
   // eslint-disable-next-line no-constant-condition
-  if (false) void session.defaultSession.loadExtension(reactDevToolsPath)
+  if (true) void session.defaultSession.loadExtension(reactDevToolsPath)
   mainWindow.on('closed', onClose)
 }
 
