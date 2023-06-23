@@ -10,7 +10,8 @@ const App: FC = () => {
   const [config, setConfig] = useState({
     slideSize: 5,
     random: true,
-    usbCopy: false
+    usbCopy: false,
+    delay: 10
   })
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playing, setPlaying] = useState('ready');
@@ -54,7 +55,12 @@ const App: FC = () => {
         ipcRenderer.send('start-record');
       } else if (playing === 'on_play' && index + 1 === (config.slideSize ? config.slideSize : slides.length)) {
           setPlaying('finished');
-          ipcRenderer.send('stop-record');
+          setTimeout(() => {
+            ipcRenderer.send('stop-record');
+          }, config.delay * 500);
+          setTimeout(() => {
+            setPlaying('ready');
+          }, config.delay * 1000);
       } else if (playing === 'on_play' && index + 1 < (config.slideSize ? config.slideSize : slides.length)) {
         setIndex((prevIndex) => {
           const newIndex = (prevIndex + 1) % (config.random ? randomNumbers.length : slides.length);
