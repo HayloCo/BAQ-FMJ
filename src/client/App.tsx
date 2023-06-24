@@ -88,13 +88,19 @@ const App: FC = () => {
         next()
       }
     };
+    
+    const leftClick = (e) => {
+      if (e.button === 0) {
+        next()
+      }
+    }
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener('contextmenu', cancel);
-    document.addEventListener('mouseup', next);
+    document.addEventListener('mouseup', leftClick);
     return () => {
       document.removeEventListener("keydown", handleKeyDown),
       document.removeEventListener('contextmenu', cancel),
-      document.removeEventListener('mouseup', next)
+      document.removeEventListener('mouseup', leftClick)
     }
   }, [slides, playing, randomNumbers, index, currentSlide, config])
 
