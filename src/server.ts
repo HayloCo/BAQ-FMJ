@@ -7,14 +7,16 @@ import * as path from 'path'
 import { type ChildProcess } from 'child_process'
 // const recorder = new Recorder()
 
+const prod = true
 let mainWindow: BrowserWindow | null
 let application: App
-let pathUSB: string
+let pathUSB: string = prod ? '' : path.resolve(__dirname, '..')
 let pathVideos: string
 let config = {
   slideSize: 5,
   random: true,
-  usbCopy: false
+  usbCopy: false,
+  delay: 10
 }
 let fileName: string
 let childProcess: ChildProcess | null
@@ -31,6 +33,9 @@ const ffmpegInstance: FFmpeg = new FFmpeg(
 function onWindowAllClosed (): void {
   if (process.platform !== 'darwin') {
     application.quit()
+  }
+  if (childProcess != null) {
+    childProcess.kill('SIGINT')
   }
 }
 
@@ -59,7 +64,7 @@ function main (appInstance: App): void {
 }
 
 ipcMain.on('start-record', (event) => {
-  if (childProcess == null) {
+  if (childProcess == null && prod) {
     fileName = `${Date.now()}.mp4`
     ffmpegInstance.outputs = {
       url: path.join(pathVideos, fileName),
@@ -76,7 +81,7 @@ ipcMain.on('start-record', (event) => {
 })
 
 ipcMain.on('stop-record', (event) => {
-  if (childProcess != null) {
+  if (childProcess != null && prod) {
     childProcess.kill('SIGINT')
     childProcess = null
     if (config.usbCopy) fs.copyFileSync(path.join(pathVideos, fileName), path.join(path.resolve(pathUSB, 'videos'), fileName))
@@ -85,27 +90,27 @@ ipcMain.on('stop-record', (event) => {
 
 ipcMain.on('get-drive', (event) => {
   void getDrives().then((drives) => {
-    drives.forEach((drive) => {
-      if (drive.isUSB ?? false) {
-        drive.mountpoints.forEach((mountpoint) => {
-          if (mountpoint.label === 'FMJLOCAL') {
-            pathVideos = mountpoint.path
-          }
-          if (mountpoint.label === 'FMJEXTERN') {
-            pathUSB = mountpoint.path
-          }
-        })
-      }
-    })
+    if (prod) {
+      drives.forEach((drive) => {
+        if (drive.isUSB ?? false) {
+          drive.mountpoints.forEach((mountpoint) => {
+            if (mountpoint.label === 'FMJLOCAL') {
+              pathVideos = mountpoint.path
+            }
+            if (mountpoint.label === 'FMJEXTERN') {
+              pathUSB = mountpoint.path
+            }
+          })
+        }
+      })
+    }
     const files = fs.readdirSync(path.resolve(pathUSB, 'slides'))
     const images = files.map(file => path.join(path.resolve(pathUSB, 'slides'), file))
     event.reply('images', images)
 
     if (fs.existsSync(path.join(pathUSB, 'config.json'))) {
       fs.readFile(path.join(pathUSB, 'config.json'), 'utf8', (_err, c) => {
-        console.log(c)
         config = JSON.parse(c)
-        console.log(config)
         event.reply('config', config)
       })
     }
