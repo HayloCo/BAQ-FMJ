@@ -53,7 +53,7 @@ const App: FC = () => {
         }
         setPlaying('on_play');
         ipcRenderer.send('start-record');
-      } else if (playing === 'on_play' && index + 1 === (config.slideSize ? config.slideSize : slides.length)) {
+      } else if (playing === 'on_play' && index === (config.slideSize ? config.slideSize : slides.length)) {
           setPlaying('finished');
           setTimeout(() => {
             ipcRenderer.send('stop-record');
@@ -61,7 +61,7 @@ const App: FC = () => {
           setTimeout(() => {
             setPlaying('ready');
           }, config.delay * 1000);
-      } else if (playing === 'on_play' && index + 1 < (config.slideSize ? config.slideSize : slides.length)) {
+      } else if (playing === 'on_play' && index < (config.slideSize ? config.slideSize : slides.length)) {
         setIndex((prevIndex) => {
           const newIndex = (prevIndex + 1) % (config.random ? randomNumbers.length : slides.length);
           if(config.random) {
