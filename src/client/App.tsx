@@ -78,6 +78,7 @@ const App: FC = () => {
       setPlaying('ready');
     }
 
+    
     const handleKeyDown = (e) => {
       e = e || window.event;
       if (e.keyCode === 67) {
@@ -88,7 +89,13 @@ const App: FC = () => {
       }
     };
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('contextmenu', cancel);
+    document.addEventListener('mouseup', next);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown),
+      document.removeEventListener('contextmenu', cancel),
+      document.removeEventListener('mouseup', next)
+    }
   }, [slides, playing, randomNumbers, index, currentSlide, config])
 
   return (
